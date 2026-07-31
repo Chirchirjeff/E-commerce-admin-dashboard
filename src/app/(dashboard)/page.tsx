@@ -1,5 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth, getDefaultRoute } from '@/contexts/AuthContext';
 import { MainLayout } from '@/components/layout/main-layout';
 import { KPICard } from '@/components/shared/kpi-card';
 import { RevenueChart } from '@/components/charts/revenue-chart';
@@ -27,12 +30,35 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { permissions, loading: authLoading } = useAuth();
+
+  // Redirect if user doesn't have dashboard view permissions
+  useEffect(() => {
+    if (!authLoading && permissions && !permissions.includes('can_view_dashboard')) {
+      const defaultRoute = getDefaultRoute(permissions);
+      router.replace(defaultRoute);
+    }
+  }, [permissions, authLoading, router]);
+
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: revenueData, isLoading: revenueLoading } = useRevenueData('30d');
   const { data: vendors, isLoading: vendorsLoading } = useTopVendors(8);
   const { data: recentOrders, isLoading: ordersLoading } = useRecentOrders(5);
 
-  // Loading state
+  // Loading or redirecting state
+  if (authLoading || (permissions && !permissions.includes('can_view_dashboard'))) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Stats Loading state
   if (statsLoading) {
     return (
       <MainLayout>

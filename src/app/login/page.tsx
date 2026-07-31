@@ -1,59 +1,83 @@
-'use client'
+'use client';
 
-import * as React from 'react'
-import { useRouter } from 'next/navigation'
-import { Eye, EyeOff, Store, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { apiClient } from '@/lib/api-client'
-import { cn } from '@/lib/utils'
+import * as React from 'react';
+import { useRouter } from 'next/navigation';
+import { Eye, EyeOff, Store, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth, getDefaultRoute } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [error, setError] = React.useState('')
+  const router = useRouter();
+  const { login, loading: authLoading, admin, permissions } = useAuth();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [error, setError] = React.useState('');
   const [formData, setFormData] = React.useState({
     email: '',
     password: '',
-  })
+  });
 
   // Check if already logged in
   React.useEffect(() => {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      router.replace('/')
+    const token = sessionStorage.getItem('access_token');
+    console.log('🔐 Checking existing token:', token ? 'Found' : 'Not found');
+    
+    if (token && admin && !authLoading) {
+      const defaultRoute = getDefaultRoute(permissions);
+      console.log('✅ Already logged in, redirecting to:', defaultRoute);
+      router.replace(defaultRoute);
     }
-  }, [router])
+  }, [admin, authLoading, router, permissions]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    console.log('🔐 Attempting login with:', formData.email);
 
     try {
-      const response = await apiClient.post('/auth/login', {
-        email: formData.email,
-        password: formData.password,
-      })
-
-      console.log('Login response:', response.data)
-
-      const token = response.data.access_token || response.data.token || response.data.accessToken
+      const result = await login(formData.email, formData.password);
+      console.log('📦 Login result:', result);
       
-      if (token) {
-        localStorage.setItem('access_token', token)
-        // Use router.replace for navigation
-        router.replace('/')
+      if (result.success) {
+        console.log('✅ Login successful! Waiting for state redirect...');
       } else {
-        setError('Invalid response from server')
-        setIsLoading(false)
+        console.log('❌ Login failed:', result.error);
+        setError(result.error || 'Invalid email or password');
+        setIsLoading(false);
       }
-    } catch (err: any) {
-      console.error('Login error:', err)
-      setError(err.response?.data?.message || 'Invalid email or password')
-      setIsLoading(false)
+    } catch (err) {
+      console.error('💥 Login error:', err);
+      setError('An unexpected error occurred');
+      setIsLoading(false);
     }
+  };
+
+  // Show loading while checking auth state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <p className="mt-4 text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If already logged in, show redirecting message
+  if (admin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <p className="mt-4 text-muted-foreground">Already logged in, redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -80,7 +104,7 @@ export default function LoginPage() {
               <label className="text-sm font-medium">Email</label>
               <input
                 type="email"
-                placeholder="admin@example.com"
+                placeholder="superadmin@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className={cn(
@@ -143,5 +167,5 @@ export default function LoginPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

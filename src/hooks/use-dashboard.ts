@@ -50,7 +50,7 @@ export function useDashboardStats() {
   return useQuery<DashboardStats>({
     queryKey: ['dashboard', 'stats'],
     queryFn: async () => {
-      const { data } = await apiClient.get('/analytics/dashboard-stats');
+      const { data } = await apiClient.get('/analytics/dashboard');
       return data;
     },
   });
@@ -72,7 +72,7 @@ export function useTopVendors(limit: number = 8) {
   return useQuery<VendorData[]>({
     queryKey: ['analytics', 'top-vendors', limit],
     queryFn: async () => {
-      const { data } = await apiClient.get(`/analytics/top-vendors?limit=${limit}`);
+      const { data } = await apiClient.get(`/analytics/vendors?limit=${limit}`);
       return data;
     },
   });
