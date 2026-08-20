@@ -54,7 +54,7 @@ export function VendorPerformanceChart({
                 <XAxis
                   type="number"
                   className="text-xs text-muted-foreground"
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `Ksh ${value}`}
                 />
                 <YAxis
                   dataKey="name"
@@ -69,7 +69,7 @@ export function VendorPerformanceChart({
                     borderRadius: '8px',
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   }}
-                  formatter={(value: number) => [`$${value}`, 'Revenue']}
+                  formatter={(value: number) => [`Ksh ${value}`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" radius={[0, 4, 4, 0]}>
                   {chartData.map((entry, index) => (

@@ -66,7 +66,7 @@ export function RevenueChart({
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="date" className="text-xs text-muted-foreground" />
-                <YAxis className="text-xs text-muted-foreground" tickFormatter={(value) => `$${value}`} />
+                <YAxis className="text-xs text-muted-foreground" tickFormatter={(value) => `Ksh ${value}`} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: 'hsl(var(--background))',
@@ -75,7 +75,7 @@ export function RevenueChart({
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                   }}
                   formatter={(value: number, name: string) => {
-                    if (name === 'revenue') return [`$${value}`, 'Revenue'];
+                    if (name === 'revenue') return [`Ksh ${value}`, 'Revenue'];
                     if (name === 'orders') return [value, 'Orders'];
                     return [value, name];
                   }}

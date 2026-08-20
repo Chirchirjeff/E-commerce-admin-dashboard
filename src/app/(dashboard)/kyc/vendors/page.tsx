@@ -113,7 +113,10 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 function fileUrl(path: string): string {
   if (!path) return '';
   if (path.startsWith('http')) return path;
-  return `${API_BASE}/${path.replace(/^\//, '')}`;
+  // path is a bare filename (e.g. "1234-abc.jpg") — always lives under /uploads/
+  const clean = path.replace(/^\//, '');
+  const withPrefix = clean.startsWith('uploads/') ? clean : `uploads/${clean}`;
+  return `${API_BASE}/${withPrefix}`;
 }
 
 function isImage(path: string): boolean {

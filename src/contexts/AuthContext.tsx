@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchProfile = useCallback(async () => {
     try {
       console.log('📤 Fetching admin profile...');
-      const response = await apiClient.get('/auth/admin/profile');
+      const response = await apiClient.get('/auth/admin/me');
       console.log('📥 Profile response:', response.data);
       
       setAdmin(response.data.admin);

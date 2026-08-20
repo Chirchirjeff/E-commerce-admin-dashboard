@@ -43,7 +43,8 @@ export default function LoginPage() {
       console.log('📦 Login result:', result);
       
       if (result.success) {
-        console.log('✅ Login successful! Waiting for state redirect...');
+        console.log('✅ Login successful!');
+        // The redirect happens automatically via the useEffect watching `admin` state
       } else {
         console.log('❌ Login failed:', result.error);
         setError(result.error || 'Invalid email or password');

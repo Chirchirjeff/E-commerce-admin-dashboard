@@ -98,7 +98,7 @@ export default function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
           title="Total Revenue"
-          value={`$${stats?.totalRevenue?.toLocaleString() || '0'}`}
+          value={`Ksh ${stats?.totalRevenue?.toLocaleString() || '0'}`}
           icon={DollarSign}
           trend={stats?.revenueGrowth}
           trendLabel="vs last month"
@@ -122,7 +122,7 @@ export default function DashboardPage() {
         />
         <KPICard
           title="Platform Commission"
-          value={`$${stats?.platformCommission?.toLocaleString() || '0'}`}
+          value={`Ksh ${stats?.platformCommission?.toLocaleString() || '0'}`}
           icon={Package}
           trend={stats?.commissionGrowth}
           trendLabel="vs last month"
@@ -210,7 +210,7 @@ export default function DashboardPage() {
             { key: 'id', label: 'Order ID', className: 'font-mono text-sm' },
             { key: 'customer', label: 'Customer' },
             { key: 'vendor', label: 'Vendor' },
-            { key: 'amount', label: 'Amount', render: (value) => `$${value?.toFixed(2)}` },
+            { key: 'amount', label: 'Amount', render: (value) => `Ksh ${value?.toFixed(2)}` },
             {
               key: 'status',
               label: 'Status',

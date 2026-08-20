@@ -40,7 +40,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Default Currency</p>
-                <p className="text-sm text-muted-foreground">USD ($)</p>
+                <p className="text-sm text-muted-foreground">KES (Ksh)</p>
               </div>
               <Button variant="outline" size="sm">Change</Button>
             </div>
@@ -71,7 +71,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Minimum Payout Amount</p>
-                <p className="text-sm text-muted-foreground">$50</p>
+                <p className="text-sm text-muted-foreground">Ksh 5000</p>
               </div>
               <Button variant="outline" size="sm">Edit</Button>
             </div>
