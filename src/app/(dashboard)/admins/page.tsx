@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, Mail, Shield, Clock, CheckCircle } from 'lucide-react';
 import { AdminUserDialog, AdminFormData } from '@/components/admins/AdminUserDialog';
+import { triggerWelcomeEmail } from '@/lib/emailTriggers';
+import { apiClient } from '@/lib/api-client';
 
 const roleColors: Record<string, string> = {
   'Super Admin': 'bg-purple-500/10 text-purple-700',
@@ -51,18 +53,8 @@ export default function AdminUsersPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('/api/users/admins', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch admins');
-      }
-      
-      const data = await response.json();
-      setAdmins(Array.isArray(data) ? data : data.data || []);
+      const response = await apiClient.get('/users/admins');
+      setAdmins(Array.isArray(response.data) ? response.data : response.data.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load admins');
       setAdmins([]);
@@ -73,18 +65,8 @@ export default function AdminUsersPage() {
 
   const fetchRoles = async () => {
     try {
-      const response = await fetch('/api/users/roles', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch roles');
-      }
-      
-      const data = await response.json();
-      setRoles(Array.isArray(data) ? data : data.data || []);
+      const response = await apiClient.get('/users/roles');
+      setRoles(Array.isArray(response.data) ? response.data : response.data.data || []);
     } catch (err) {
       console.error('Failed to fetch roles:', err);
     }
@@ -111,18 +93,7 @@ export default function AdminUsersPage() {
       setIsSubmitting(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
       const isCreating = !formData.id;
-      const url = isCreating
-        ? '/api/users/admins'
-        : `/api/users/admins/${formData.id}`;
-
-      const method = isCreating ? 'POST' : 'PUT';
-
       const payload = isCreating
         ? {
             name: formData.name,
@@ -136,20 +107,20 @@ export default function AdminUsersPage() {
             isActive: formData.isActive,
           };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      if (isCreating) {
+        await apiClient.post('/users/admins', payload);
+      } else {
+        await apiClient.put(`/users/admins/${formData.id}`, payload);
+      }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `Failed to ${isCreating ? 'create' : 'update'} admin`
-        );
+      // Fire welcome email for newly created admin users
+      if (isCreating) {
+        triggerWelcomeEmail({
+          recipientEmail: formData.email,
+          recipientName: formData.name,
+          role: 'admin',
+          temporaryPassword: formData.password,
+        });
       }
 
       await fetchAdmins();
@@ -168,16 +139,7 @@ export default function AdminUsersPage() {
     }
 
     try {
-      const response = await fetch(`/api/users/admins/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete admin');
-      }
+      await apiClient.delete(`/users/admins/${id}`);
 
       setAdmins(admins.filter(admin => admin.id !== id));
       setError(null);

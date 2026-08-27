@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { DollarSign, Filter, Download, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { triggerPayoutEmail } from '@/lib/emailTriggers'
 
 interface Payout {
   id: string
@@ -115,8 +116,30 @@ export default function PayoutsPage() {
 
       if (refreshResponse.ok) {
         const data = await refreshResponse.json()
-        const payoutList = Array.isArray(data) ? data : data.data || []
+        const payoutList: Payout[] = Array.isArray(data) ? data : data.data || []
         setPayouts(payoutList)
+
+        // Fire payout notification emails for all newly-processed payouts.
+        // The backend response is expected to carry vendorEmail / vendorName
+        // where available. We fire best-effort — missing fields are skipped.
+        payoutList.forEach((payout: Payout & {
+          vendorEmail?: string;
+          vendorName?: string;
+          destinationAccount?: string;
+        }) => {
+          if (payout.vendorEmail) {
+            triggerPayoutEmail({
+              recipientEmail: payout.vendorEmail,
+              recipientName: payout.vendorName ?? payout.vendor,
+              storeName: payout.vendor,
+              payoutId: payout.id,
+              status: payout.status as 'initiated' | 'processing' | 'completed' | 'failed',
+              amount: payout.amount,
+              destinationAccount: payout.destinationAccount ?? 'M-Pesa account on file',
+              period: payout.period,
+            });
+          }
+        });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to process payouts')

@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+const PASSWORD_MIN_LENGTH = 8;
+
 interface AdminUserDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,6 +46,14 @@ interface Role {
   name: string;
 }
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  roleId?: string;
+  submit?: string;
+}
+
 export function AdminUserDialog({
   isOpen,
   onOpenChange,
@@ -59,6 +69,7 @@ export function AdminUserDialog({
     password: '',
     roleId: '',
   });
+  const [errors, setErrors] = useState<FormErrors>({});
 
   useEffect(() => {
     if (isEditing && initialData) {
@@ -71,19 +82,30 @@ export function AdminUserDialog({
         roleId: '',
       });
     }
+    setErrors({});
   }, [isOpen, isEditing, initialData]);
+
+  const validate = (): FormErrors => {
+    const errs: FormErrors = {};
+    if (!formData.name.trim()) errs.name = 'Name is required';
+    if (!formData.email.trim()) errs.email = 'Email is required';
+    if (!formData.roleId) errs.roleId = 'Role is required';
+    if (!isEditing) {
+      if (!formData.password) {
+        errs.password = 'Password is required';
+      } else if (formData.password.length < PASSWORD_MIN_LENGTH) {
+        errs.password = `Password must be at least ${PASSWORD_MIN_LENGTH} characters`;
+      }
+    }
+    return errs;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.name || !formData.email || !formData.roleId) {
-      alert('Please fill in all required fields');
-      return;
-    }
-
-    if (!isEditing && !formData.password) {
-      alert('Password is required for new admins');
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -91,7 +113,8 @@ export function AdminUserDialog({
       await onSubmit(formData);
       onOpenChange(false);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      const message = error instanceof Error ? error.message : 'An error occurred. Please try again.';
+      setErrors({ submit: message });
     }
   };
 
@@ -108,18 +131,27 @@ export function AdminUserDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Submit-level error (e.g. API error) */}
+          {errors.submit && (
+            <div className="rounded-md bg-red-500/10 p-3 text-sm text-red-600">
+              {errors.submit}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
               placeholder="Admin Name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => {
+                setFormData({ ...formData, name: e.target.value });
+                if (errors.name) setErrors({ ...errors, name: undefined });
+              }}
               disabled={isLoading}
-              required
+              className={errors.name ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
@@ -129,12 +161,14 @@ export function AdminUserDialog({
               type="email"
               placeholder="admin@example.com"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => {
+                setFormData({ ...formData, email: e.target.value });
+                if (errors.email) setErrors({ ...errors, email: undefined });
+              }}
               disabled={isLoading}
-              required
+              className={errors.email ? 'border-red-500 focus-visible:ring-red-500' : ''}
             />
+            {errors.email && <p className="text-xs text-red-600">{errors.email}</p>}
           </div>
 
           {!isEditing && (
@@ -143,14 +177,17 @@ export function AdminUserDialog({
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter password"
+                placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
                 value={formData.password || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  if (errors.password) setErrors({ ...errors, password: undefined });
+                }}
                 disabled={isLoading}
-                required
+                minLength={PASSWORD_MIN_LENGTH}
+                className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
               />
+              {errors.password && <p className="text-xs text-red-600">{errors.password}</p>}
             </div>
           )}
 
@@ -158,12 +195,13 @@ export function AdminUserDialog({
             <Label htmlFor="role">Role *</Label>
             <Select
               value={formData.roleId}
-              onValueChange={(value) =>
-                setFormData({ ...formData, roleId: value })
-              }
+              onValueChange={(value) => {
+                setFormData({ ...formData, roleId: value });
+                if (errors.roleId) setErrors({ ...errors, roleId: undefined });
+              }}
               disabled={isLoading}
             >
-              <SelectTrigger>
+              <SelectTrigger className={errors.roleId ? 'border-red-500 focus-visible:ring-red-500' : ''}>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
@@ -174,6 +212,7 @@ export function AdminUserDialog({
                 ))}
               </SelectContent>
             </Select>
+            {errors.roleId && <p className="text-xs text-red-600">{errors.roleId}</p>}
           </div>
 
           <DialogFooter>

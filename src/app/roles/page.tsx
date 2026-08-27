@@ -7,6 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Shield, Plus, Trash2, Edit } from 'lucide-react';
 import { RoleDialog, RoleFormData } from '@/components/roles/RoleDialog';
+import { apiClient } from '@/lib/api-client';
+import { AxiosError } from 'axios';
 
 interface Permission {
   id: string;
@@ -32,9 +34,17 @@ const systemRoleColors: Record<string, string> = {
   'Support Admin': 'text-orange-500',
 };
 
+function formatPermissionName(name: string) {
+  return name
+    .replace(/^can_/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 export default function RolesPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
+  const [permissionsError, setPermissionsError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,18 +60,8 @@ export default function RolesPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('/api/users/roles', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch roles');
-      }
-
-      const data = await response.json();
-      setRoles(Array.isArray(data) ? data : data.data || []);
+      const response = await apiClient.get('/users/roles');
+      setRoles(Array.isArray(response.data) ? response.data : response.data.data || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load roles');
       setRoles([]);
@@ -72,31 +72,17 @@ export default function RolesPage() {
 
   const fetchPermissions = async () => {
     try {
-      console.log('📤 Fetching permissions...');
-      const token = localStorage.getItem('token');
-      console.log('Token available:', !!token);
-      
-      const response = await fetch('/api/users/permissions', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      console.log('Response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API error response:', errorText);
-        throw new Error(`Failed to fetch permissions: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      console.log('✅ Permissions fetched:', data);
-      setPermissions(Array.isArray(data) ? data : data.data || []);
+      setPermissionsError(null);
+      const response = await apiClient.get('/users/permissions');
+      setPermissions(Array.isArray(response.data) ? response.data : response.data.data || []);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-      console.error('❌ Failed to fetch permissions:', errorMsg);
-      setError(`Failed to load permissions: ${errorMsg}`);
+      const apiError = err as AxiosError<{ message?: string | string[] }>;
+      const message = Array.isArray(apiError.response?.data?.message)
+        ? apiError.response.data.message[0]
+        : apiError.response?.data?.message || apiError.message || 'Failed to load permissions';
+      setPermissions([]);
+      setPermissionsError(message);
+      setError(`Failed to load permissions: ${message}`);
     }
   };
 
@@ -106,12 +92,8 @@ export default function RolesPage() {
   };
 
   const handleEditRole = (role: Role) => {
-    if (role.isSystem) {
-      alert('System roles cannot be edited');
-      return;
-    }
-    
     setEditingRole({
+      id: role.id,
       name: role.name,
       description: role.description || '',
       permissionIds: role.permissions.map((p) => p.id),
@@ -125,19 +107,7 @@ export default function RolesPage() {
     }
 
     try {
-      const response = await fetch(`/api/users/roles/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || 'Failed to delete role'
-        );
-      }
+      await apiClient.delete(`/users/roles/${id}`);
 
       await fetchRoles();
       setError(null);
@@ -152,32 +122,16 @@ export default function RolesPage() {
       setIsSubmitting(true);
       setError(null);
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Authentication token not found');
-      }
-
       const isCreating = !formData.id;
-      const url = isCreating
-        ? '/api/users/roles'
-        : `/api/users/roles/${formData.id}`;
-
-      const method = isCreating ? 'POST' : 'PUT';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || `Failed to ${isCreating ? 'create' : 'update'} role`
-        );
+      const payload = {
+        name: formData.name,
+        description: formData.description,
+        permissionIds: formData.permissionIds,
+      };
+      if (isCreating) {
+        await apiClient.post('/users/roles', payload);
+      } else {
+        await apiClient.put(`/users/roles/${formData.id}`, payload);
       }
 
       await fetchRoles();
@@ -216,6 +170,7 @@ export default function RolesPage() {
             isEditing={!!editingRole}
             initialData={editingRole || undefined}
             permissions={permissions}
+            permissionsError={permissionsError}
             isLoading={isSubmitting}
           />
 
@@ -268,7 +223,7 @@ export default function RolesPage() {
                       <div className="flex flex-wrap gap-1">
                         {role.permissions.slice(0, 3).map((perm) => (
                           <span key={perm.id} className="text-xs bg-muted px-2 py-0.5 rounded-full">
-                            {perm.name}
+                            {formatPermissionName(perm.name)}
                           </span>
                         ))}
                         {role.permissions.length > 3 && (
@@ -285,8 +240,7 @@ export default function RolesPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            title={role.isSystem ? 'System roles cannot be edited' : 'Edit role'}
-                            disabled={role.isSystem}
+                            title="Edit role"
                             onClick={() => handleEditRole(role)}
                           >
                             <Edit className="h-4 w-4" />
@@ -295,8 +249,8 @@ export default function RolesPage() {
                             variant="ghost"
                             size="sm"
                             className="text-red-500 hover:bg-red-500/10"
-                            title={role.isSystem ? 'System roles cannot be deleted' : 'Delete role'}
-                            disabled={role.isSystem}
+                            title={role.name === 'Super Admin' ? 'The Super Admin role cannot be deleted' : 'Delete role'}
+                            disabled={role.name === 'Super Admin'}
                             onClick={() => handleDeleteRole(role.id, role.name)}
                           >
                             <Trash2 className="h-4 w-4" />

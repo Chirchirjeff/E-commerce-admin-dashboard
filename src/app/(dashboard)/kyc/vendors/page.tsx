@@ -456,7 +456,7 @@ function KYCVendorsContent() {
   const approveMutation = useMutation({
     mutationFn: ({ id, comment }: { id: string; comment: string }) =>
       apiClient.post(`/kyc/${id}/approve`, { comment }),
-    onSuccess: (_, { id }) => {
+    onSuccess: () => {
       toast.success('Vendor approved', 'The seller has been verified and their shop is now active.');
       queryClient.invalidateQueries({ queryKey: ['kyc'] });
       setSelectedId(null);

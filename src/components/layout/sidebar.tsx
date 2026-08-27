@@ -23,6 +23,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -39,6 +40,7 @@ const ALL_MENU_ITEMS = [
   { label: 'Analytics',      icon: TrendingUp,      href: '/analytics',    permission: 'can_view_reports'     },
   { label: 'Reviews',        icon: Star,            href: '/reviews',      permission: 'can_view_all'         },
   { label: 'Reports',        icon: ClipboardList,   href: '/reports',      permission: 'can_view_reports'     },
+  { label: 'Email Dispatch', icon: Mail,            href: '/email',        permission: 'can_manage_settings'  },
   // KYC
   { label: 'Verify Clients', icon: UserCheck,       href: '/kyc/clients',  permission: 'can_verify_clients'   },
   { label: 'Verify Vendors', icon: Building2,       href: '/kyc/vendors',  permission: 'can_verify_vendors'   },

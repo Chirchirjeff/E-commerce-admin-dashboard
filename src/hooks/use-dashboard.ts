@@ -98,7 +98,7 @@ export function useRecentOrders(limit: number = 5) {
       // Transform data to match frontend format
       return data.map((order: any) => ({
         id: order.id,
-        customer: order.buyer?.name || 'Unknown',
+        customer: order.deliveryName || order.buyer?.name || 'Unknown',
         vendor: order.shop?.name || 'Unknown',
         amount: order.total,
         status: order.status,

@@ -21,6 +21,7 @@ interface RoleDialogProps {
   isEditing?: boolean;
   initialData?: RoleFormData;
   permissions: Permission[];
+  permissionsError?: string | null;
   isLoading?: boolean;
 }
 
@@ -50,6 +51,13 @@ const PERMISSION_TO_SIDEBAR_ITEMS: Record<string, string[]> = {
   'can_manage_settings': ['Settings'],
 };
 
+function formatPermissionName(name: string) {
+  return name
+    .replace(/^can_/, '')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
 export function RoleDialog({
   isOpen,
   onOpenChange,
@@ -57,6 +65,7 @@ export function RoleDialog({
   isEditing = false,
   initialData,
   permissions,
+  permissionsError = null,
   isLoading = false,
 }: RoleDialogProps) {
   const [formData, setFormData] = useState<RoleFormData>({
@@ -183,10 +192,15 @@ export function RoleDialog({
           <div className="space-y-3">
             <Label>Select Permissions *</Label>
             <div className="space-y-2 text-sm">
-              {permissions.length === 0 ? (
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-yellow-900 text-xs">
-                  <p className="font-semibold">⏳ Loading permissions...</p>
-                  <p className="text-xs mt-1">If this takes too long, check browser console (F12) for errors.</p>
+              {permissionsError ? (
+                <div className="rounded border border-red-200 bg-red-50 p-3 text-xs text-red-900">
+                  <p className="font-semibold">Permissions could not be loaded.</p>
+                  <p className="mt-1">{permissionsError}</p>
+                </div>
+              ) : permissions.length === 0 ? (
+                <div className="rounded border border-yellow-200 bg-yellow-50 p-3 text-xs text-yellow-900">
+                  <p className="font-semibold">No permissions are available yet.</p>
+                  <p className="mt-1">Seed the backend roles and permissions, then refresh this page.</p>
                 </div>
               ) : (
                 <>
@@ -225,7 +239,7 @@ export function RoleDialog({
                                   htmlFor={permission.id}
                                   className="text-sm font-medium cursor-pointer"
                                 >
-                                  {permission.name}
+                                  {formatPermissionName(permission.name)}
                                 </label>
                               </div>
                               {sidebarItems.length > 0 && (
