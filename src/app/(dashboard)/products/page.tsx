@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { MainLayout } from '@/components/layout/main-layout'
+import { LoadingStatus, StatCardsSkeleton, TableCardSkeleton } from '@/components/shared/skeletons'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -146,11 +147,10 @@ export default function ProductsPage() {
 
           {/* Loading State */}
           {isLoading && (
-            <Card className="mb-6">
-              <CardContent className="p-4">
-                <p className="text-center text-muted-foreground">Loading products...</p>
-              </CardContent>
-            </Card>
+            <LoadingStatus label="Loading products…">
+              <StatCardsSkeleton className="mb-6 md:grid-cols-4" />
+              <TableCardSkeleton columns={8} />
+            </LoadingStatus>
           )}
 
           {/* Stats */}

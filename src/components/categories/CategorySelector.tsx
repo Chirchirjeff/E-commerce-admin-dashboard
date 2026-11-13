@@ -3,7 +3,9 @@
 import React, { useState, useMemo } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import { MarketplaceCategory } from '@/lib/api';
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { LoadingStatus } from '@/components/shared/skeletons';
 import { cn } from '@/lib/utils';
 
 interface CategorySelectorProps {
@@ -131,9 +133,14 @@ export function CategorySelector({ value, onChange, onlyLeaf = true }: CategoryS
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-5 w-5 animate-spin" />
-      </div>
+      <LoadingStatus label="Loading categories…" className="space-y-2 rounded-lg border p-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-2" style={{ paddingLeft: (i % 3) * 16 }}>
+            <Skeleton className="h-4 w-4" />
+            <Skeleton className={i % 2 ? 'h-4 w-32' : 'h-4 w-44'} />
+          </div>
+        ))}
+      </LoadingStatus>
     );
   }
 

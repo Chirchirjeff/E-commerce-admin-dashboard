@@ -3,6 +3,7 @@
 import { useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { AppShellSkeleton, StatsTablePageSkeleton } from '@/components/shared/skeletons';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -35,13 +36,11 @@ export function ProtectedRoute({
   }, [admin, loading, router, redirectTo, requiredPermissions, hasAllPermissions]);
 
   if (loading) {
+    // Layout-shaped placeholder (sidebar + header + generic page body) while auth resolves
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
-        </div>
-      </div>
+      <AppShellSkeleton>
+        <StatsTablePageSkeleton label="Loading…" columns={6} actions={1} />
+      </AppShellSkeleton>
     );
   }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { CardGridSkeleton, LoadingStatus } from '@/components/shared/skeletons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Plus, Trash2, Edit } from 'lucide-react';
@@ -185,11 +186,9 @@ export default function RolesPage() {
 
           {/* Loading State */}
           {isLoading && (
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-center text-muted-foreground">Loading roles...</p>
-              </CardContent>
-            </Card>
+            <LoadingStatus label="Loading roles…">
+              <CardGridSkeleton />
+            </LoadingStatus>
           )}
 
           {/* Roles Grid */}

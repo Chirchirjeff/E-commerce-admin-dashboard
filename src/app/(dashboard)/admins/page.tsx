@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { LoadingStatus, StatCardsSkeleton, TableCardSkeleton } from '@/components/shared/skeletons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -188,11 +189,10 @@ export default function AdminUsersPage() {
 
           {/* Loading State */}
           {isLoading && (
-            <Card>
-              <CardContent className="p-4">
-                <p className="text-center text-muted-foreground">Loading admin users...</p>
-              </CardContent>
-            </Card>
+            <LoadingStatus label="Loading admin users…" className="space-y-6">
+              <StatCardsSkeleton className="md:grid-cols-4" />
+              <TableCardSkeleton columns={7} withDescription />
+            </LoadingStatus>
           )}
 
           {/* Summary Cards */}

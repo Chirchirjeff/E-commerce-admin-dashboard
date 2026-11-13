@@ -59,6 +59,7 @@ export interface MarketplaceCategory {
   sortOrder: number;
   isActive: boolean;
   children?: MarketplaceCategory[];
+  attributes?: CategoryAttribute[];
   _count?: {
     products: number;
     children: number;

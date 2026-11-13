@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MainLayout } from '@/components/layout/main-layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LoadingStatus, RecordCardsSkeleton } from '@/components/shared/skeletons';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { apiClient } from '@/lib/api-client';
@@ -150,7 +151,7 @@ function DocViewer({ label, path }: { label: string; path: string }) {
       <div className="relative rounded-xl border overflow-hidden bg-muted min-h-[180px] flex items-center justify-center">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={label} className="max-h-64 w-full object-contain" />
+          <img src={url} alt={label} loading="lazy" decoding="async" className="max-h-64 w-full object-contain" />
         ) : (
           <div className="flex flex-col items-center gap-2 p-6 text-muted-foreground">
             <FileText className="h-10 w-10 opacity-40" />
@@ -526,10 +527,9 @@ function KYCVendorsContent() {
 
         {/* States */}
         {isLoading && (
-          <div className="flex items-center justify-center py-16 text-muted-foreground gap-3">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading KYC submissions…</span>
-          </div>
+          <LoadingStatus label="Loading KYC submissions…">
+            <RecordCardsSkeleton />
+          </LoadingStatus>
         )}
         {isError && (
           <Card className="border-destructive/40">

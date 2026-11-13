@@ -24,6 +24,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
+  UserCog,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -44,6 +45,7 @@ const ALL_MENU_ITEMS = [
   // KYC
   { label: 'Verify Clients', icon: UserCheck,       href: '/kyc/clients',  permission: 'can_verify_clients'   },
   { label: 'Verify Vendors', icon: Building2,       href: '/kyc/vendors',  permission: 'can_verify_vendors'   },
+  { label: 'Detail Changes', icon: UserCog,         href: '/kyc/detail-changes', permission: 'can_verify_vendors' },
   // Admin
   { label: 'Role Management',icon: ShieldCheck,     href: '/roles',        permission: 'can_manage_roles'     },
   { label: 'Admin Users',    icon: Users,           href: '/admins',       permission: 'can_manage_admins'    },

@@ -8,7 +8,9 @@ import { MarketplaceCategory, SellerCollection, SellerTag } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ChevronRight, Tag, FolderOpen, Layers } from 'lucide-react';
+import { ChevronRight, Tag, FolderOpen, Layers } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ListRowsSkeleton, LoadingStatus } from '@/components/shared/skeletons';
 import { cn } from '@/lib/utils';
 
 export function CategoriesPanel() {
@@ -120,9 +122,14 @@ export function CategoriesPanel() {
             </CardHeader>
             <CardContent>
               {isLoadingCategories ? (
-                <div className="flex items-center justify-center p-8">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
+                <LoadingStatus label="Loading categories…" className="space-y-2 rounded-lg border p-4">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-2" style={{ paddingLeft: (i % 3) * 16 }}>
+                      <Skeleton className="h-4 w-4" />
+                      <Skeleton className={i % 2 ? 'h-4 w-32' : 'h-4 w-44'} />
+                    </div>
+                  ))}
+                </LoadingStatus>
               ) : categories && categories.length > 0 ? (
                 <div className="border rounded-lg p-4 max-h-96 overflow-y-auto">
                   {renderCategoryTree(categories)}
@@ -147,9 +154,9 @@ export function CategoriesPanel() {
             </CardHeader>
             <CardContent>
               {isLoadingCollections ? (
-                <div className="flex items-center justify-center p-8">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
+                <LoadingStatus label="Loading collections…">
+                  <ListRowsSkeleton rows={3} />
+                </LoadingStatus>
               ) : collections && collections.length > 0 ? (
                 <div className="grid gap-3">
                   {collections.map(collection => (
@@ -201,9 +208,11 @@ export function CategoriesPanel() {
             </CardHeader>
             <CardContent>
               {isLoadingTags ? (
-                <div className="flex items-center justify-center p-8">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
+                <LoadingStatus label="Loading tags…" className="flex flex-wrap gap-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Skeleton key={i} className={i % 2 ? 'h-7 w-16 rounded-full' : 'h-7 w-24 rounded-full'} />
+                  ))}
+                </LoadingStatus>
               ) : tags && tags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {tags.map(tag => (

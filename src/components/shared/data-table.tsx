@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ChevronLeft, ChevronRight, Eye, MoreHorizontal, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Eye, MoreHorizontal } from 'lucide-react'
+import { TableRowsSkeleton } from '@/components/shared/skeletons'
 
 interface Column {
   key: string
@@ -86,18 +87,8 @@ export function DataTable({
             </thead>
             <tbody>
               {isLoading ? (
-                // Loading state
-                <tr>
-                  <td
-                    colSpan={columns.length + 1}
-                    className="py-12 text-center text-muted-foreground"
-                  >
-                    <div className="flex flex-col items-center justify-center gap-2">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                      <span>Loading...</span>
-                    </div>
-                  </td>
-                </tr>
+                // Loading state — skeleton rows matching the table layout
+                <TableRowsSkeleton columns={columns.length + 1} rows={rowsPerPage} label="Loading…" />
               ) : data.length === 0 ? (
                 // Empty state
                 <tr>

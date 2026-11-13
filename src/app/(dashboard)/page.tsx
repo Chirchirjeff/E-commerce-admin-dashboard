@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth, getDefaultRoute } from '@/contexts/AuthContext';
 import { MainLayout } from '@/components/layout/main-layout';
 import { KPICard } from '@/components/shared/kpi-card';
-import { RevenueChart } from '@/components/charts/revenue-chart';
-import { VendorPerformanceChart } from '@/components/charts/vendor-performance-chart';
-import { OrderStatusChart } from '@/components/charts/order-status-chart';
+import { LazyTrendChart } from '@/components/charts/lazy';
+import { ChartCard, RankedBars, StatusBreakdown, formatCount, formatKsh } from '@/components/charts/chart-kit';
+import {
+  AppShellSkeleton,
+  ChartBodySkeleton,
+  DashboardContentSkeleton,
+  ListRowsSkeleton,
+  LoadingStatus,
+} from '@/components/shared/skeletons';
 import { DataTable } from '@/components/shared/data-table';
 import {
   useDashboardStats,
@@ -49,12 +55,9 @@ export default function DashboardPage() {
   // Loading or redirecting state
   if (authLoading || (permissions && !permissions.includes('can_view_dashboard'))) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Redirecting...</p>
-        </div>
-      </div>
+      <AppShellSkeleton>
+        <DashboardContentSkeleton />
+      </AppShellSkeleton>
     );
   }
 
@@ -62,12 +65,7 @@ export default function DashboardPage() {
   if (statsLoading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-96">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-          </div>
-        </div>
+        <DashboardContentSkeleton />
       </MainLayout>
     );
   }
@@ -186,17 +184,49 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-6">
-        <div className="lg:col-span-3">
-          <RevenueChart data={revenueData} isLoading={revenueLoading} />
-        </div>
-        <div className="lg:col-span-2">
-          <VendorPerformanceChart data={vendors} isLoading={vendorsLoading} />
-        </div>
-        <div className="lg:col-span-1">
-          <OrderStatusChart data={stats?.orderStatus} isLoading={statsLoading} />
-        </div>
+      {/* Charts — the grid cells are min-w-0 so charts can shrink on any screen */}
+      <div className="mt-6 grid min-w-0 gap-6 xl:grid-cols-3">
+        <ChartCard title="Platform revenue" subtitle="Last 30 days, excluding cancelled orders" className="xl:col-span-2">
+          {revenueLoading ? (
+            <LoadingStatus label="Loading revenue…" className="h-[300px]">
+              <ChartBodySkeleton variant="line" />
+            </LoadingStatus>
+          ) : (
+            <LazyTrendChart
+              data={revenueData ?? []}
+              metrics={[
+                { key: 'revenue', label: 'Revenue', money: true, format: (v) => formatKsh(v) },
+                { key: 'orders', label: 'Orders', format: (v) => formatCount(v) },
+              ]}
+            />
+          )}
+        </ChartCard>
+
+        <ChartCard title="Order status" subtitle="All orders on the platform">
+          {statsLoading ? (
+            <LoadingStatus label="Loading order status…"><ChartBodySkeleton variant="bar" /></LoadingStatus>
+          ) : (
+            <StatusBreakdown data={stats?.orderStatus ?? []} />
+          )}
+        </ChartCard>
+
+        <ChartCard title="Top vendors" subtitle="Ranked by revenue (excluding cancelled orders)" className="xl:col-span-3">
+          {vendorsLoading ? (
+            <ListRowsSkeleton rows={6} />
+          ) : (
+            <RankedBars
+              className="lg:columns-2 lg:gap-12"
+              items={(vendors ?? []).map((v: { name: string; revenue: number; orders: number; rating?: number }) => ({
+                key: v.name,
+                label: v.name,
+                value: v.revenue,
+                detail: `${formatCount(v.orders)} order${v.orders === 1 ? '' : 's'}${v.rating ? ` · ${v.rating.toFixed(1)}★` : ''}`,
+              }))}
+              format={(v) => formatKsh(v, true)}
+              emptyText="No vendor sales yet."
+            />
+          )}
+        </ChartCard>
       </div>
 
       {/* Recent Orders */}

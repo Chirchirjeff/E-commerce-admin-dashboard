@@ -314,7 +314,7 @@ export function CreateProductForm() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {(searchTagQuery ? searchResults : tags).map(tag => (
+              {(searchTagQuery ? searchResults ?? [] : tags ?? []).map(tag => (
                 <button
                   key={tag.id}
                   type="button"

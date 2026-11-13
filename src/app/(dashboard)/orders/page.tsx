@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react'
 import { MainLayout } from '@/components/layout/main-layout'
+import { LoadingStatus, StatCardsSkeleton, TableCardSkeleton } from '@/components/shared/skeletons'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -116,11 +117,10 @@ export default function OrdersPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <Card className="mb-6">
-          <CardContent className="p-4">
-            <p className="text-center text-muted-foreground">Loading orders...</p>
-          </CardContent>
-        </Card>
+        <LoadingStatus label="Loading orders…">
+          <StatCardsSkeleton className="mb-6" />
+          <TableCardSkeleton columns={7} />
+        </LoadingStatus>
       )}
 
       {/* Stats Cards */}
