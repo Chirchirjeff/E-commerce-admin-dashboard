@@ -105,7 +105,7 @@ export default function LoginPage() {
               <label className="text-sm font-medium">Email</label>
               <input
                 type="email"
-                placeholder="superadmin@example.com"
+                placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className={cn(
