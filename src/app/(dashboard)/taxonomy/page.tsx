@@ -74,6 +74,11 @@ function barColour(phase: ProgressEvent['phase']): string {
   return 'bg-primary'
 }
 
+function formatUploadBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function TaxonomyPage() {
@@ -127,7 +132,13 @@ export default function TaxonomyPage() {
     }
   }
 
-  // ── Import via fetch + SSE ────────────────────────────────────────────────
+  // ── Import via XHR — gives upload.onprogress AND streaming response reads ──
+  //
+  // fetch() delivers the full response body before any .body reader yields
+  // data in many browser/proxy configurations, so the SSE events only appear
+  // after the upload is completely done. XHR solves both halves:
+  //   • xhr.upload.onprogress  → bytes leaving the browser (0 → 25%)
+  //   • xhr.onprogress         → response bytes arriving (SSE events, 25 → 100%)
   const handleImport = async () => {
     if (!file || importing) return
     setImporting(true)
@@ -141,57 +152,76 @@ export default function TaxonomyPage() {
       ? sessionStorage.getItem('access_token')
       : null
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/gpc/import`,
-        {
-          method: 'POST',
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          body: form,
-        },
-      )
+    const url = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000'}/gpc/import`
 
-      if (!res.ok) {
-        const text = await res.text()
-        throw new Error(`HTTP ${res.status}: ${text}`)
+    await new Promise<void>((resolve) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('POST', url)
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+
+      // ── Phase 1: upload progress (0 → 25%) ──
+      xhr.upload.onprogress = (evt) => {
+        if (!evt.lengthComputable) return
+        const uploadPct = Math.round((evt.loaded / evt.total) * 25)
+        setProgress({
+          phase: 'parse',
+          message: `Uploading file… ${formatUploadBytes(evt.loaded)} / ${formatUploadBytes(evt.total)}`,
+          current: evt.loaded,
+          total: evt.total,
+          pct: uploadPct,
+        })
       }
 
-      // Parse the SSE stream line by line
-      const reader = res.body!.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
+      // ── Phase 2: streaming response — SSE events arrive here (25 → 100%) ──
+      let responseBuffer = ''
+      xhr.onprogress = () => {
+        // xhr.responseText grows as chunks arrive — diff against what we've parsed
+        const newText = xhr.responseText.slice(responseBuffer.length)
+        responseBuffer = xhr.responseText
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        buffer += decoder.decode(value, { stream: true })
-
-        // SSE frames are separated by double newlines
-        const frames = buffer.split('\n\n')
-        buffer = frames.pop() ?? '' // keep any incomplete frame
-
+        const frames = newText.split('\n\n')
         for (const frame of frames) {
           const dataLine = frame.split('\n').find(l => l.startsWith('data:'))
           if (!dataLine) continue
           try {
             const event: ProgressEvent = JSON.parse(dataLine.slice(5).trim())
-            setProgress(event)
-            setLog(prev => [...prev, event])
-            if (event.phase === 'done' || event.phase === 'error') break
+            // Remap server pct (0–100) into the 25–100 display band
+            const displayPct = 25 + Math.round(event.pct * 0.75)
+            const mapped: ProgressEvent = { ...event, pct: displayPct }
+            setProgress(mapped)
+            setLog(prev => [...prev, mapped])
           } catch { /* ignore malformed frame */ }
         }
       }
-    } catch (err: any) {
-      const errEvent: ProgressEvent = {
-        phase: 'error', message: err.message ?? 'Upload failed',
-        current: 0, total: 0, pct: 0, error: err.message,
+
+      xhr.onload = () => {
+        if (xhr.status < 200 || xhr.status >= 300) {
+          let msg = `HTTP ${xhr.status}`
+          try { msg = JSON.parse(xhr.responseText).message ?? msg } catch {}
+          const errEvent: ProgressEvent = {
+            phase: 'error', message: msg, current: 0, total: 0, pct: 0, error: msg,
+          }
+          setProgress(errEvent)
+          setLog(prev => [...prev, errEvent])
+        }
+        resolve()
       }
-      setProgress(errEvent)
-      setLog(prev => [...prev, errEvent])
-    } finally {
-      setImporting(false)
-      loadVersions()
-    }
+
+      xhr.onerror = () => {
+        const errEvent: ProgressEvent = {
+          phase: 'error', message: 'Network error', current: 0, total: 0, pct: 0,
+          error: 'Connection failed — check the backend is running',
+        }
+        setProgress(errEvent)
+        setLog(prev => [...prev, errEvent])
+        resolve()
+      }
+
+      xhr.send(form)
+    })
+
+    setImporting(false)
+    loadVersions()
   }
 
   // ── Promote a past version to current ────────────────────────────────────
@@ -299,7 +329,7 @@ export default function TaxonomyPage() {
                   {!isDone && !isError && (
                     <RefreshCw className="h-5 w-5 animate-spin text-primary" />
                   )}
-                  {isDone ? 'Import complete' : isError ? 'Import failed' : 'Importing…'}
+                  {isDone ? 'Import complete' : isError ? 'Import failed' : progress.phase === 'parse' && progress.total > 0 && progress.current < progress.total ? 'Uploading file…' : 'Processing…'}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
