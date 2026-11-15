@@ -25,6 +25,8 @@ import {
   ChevronRight,
   Mail,
   UserCog,
+  Tags,
+  BookOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -50,6 +52,9 @@ const ALL_MENU_ITEMS = [
   { label: 'Role Management',icon: ShieldCheck,     href: '/roles',        permission: 'can_manage_roles'     },
   { label: 'Admin Users',    icon: Users,           href: '/admins',       permission: 'can_manage_admins'    },
   { label: 'Settings',       icon: Settings,        href: '/settings',     permission: 'can_manage_settings'  },
+  // Platform data management
+  { label: 'GPC Taxonomy',   icon: Tags,            href: '/taxonomy',     permission: 'can_manage_marketplace_categories' },
+  { label: 'System Docs',    icon: BookOpen,        href: '/system-docs',  permission: 'can_manage_settings'  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -159,9 +164,10 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
     !item.permission || permissions.includes(item.permission)
   );
 
-  const mainItems  = visible.filter(i => !i.href.includes('/kyc/') && !i.href.includes('/roles') && !i.href.includes('/admins'));
-  const kycItems   = visible.filter(i => i.href.includes('/kyc/'));
-  const adminItems = visible.filter(i => i.href.includes('/roles') || i.href.includes('/admins'));
+  const mainItems     = visible.filter(i => !i.href.includes('/kyc/') && !i.href.includes('/roles') && !i.href.includes('/admins') && i.href !== '/taxonomy' && i.href !== '/system-docs');
+  const kycItems      = visible.filter(i => i.href.includes('/kyc/'));
+  const adminItems    = visible.filter(i => i.href.includes('/roles') || i.href.includes('/admins'));
+  const platformItems = visible.filter(i => i.href === '/taxonomy' || i.href === '/system-docs');
 
   return (
     <div className="flex h-full flex-col">
@@ -243,6 +249,13 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
         <NavSection
           title="Administration"
           items={adminItems}
+          pathname={pathname}
+          collapsed={desktopCollapsed}
+          onMobileClose={onMobileClose}
+        />
+        <NavSection
+          title="Platform"
+          items={platformItems}
           pathname={pathname}
           collapsed={desktopCollapsed}
           onMobileClose={onMobileClose}
