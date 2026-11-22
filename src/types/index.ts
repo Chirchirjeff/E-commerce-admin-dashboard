@@ -60,3 +60,21 @@ export interface DataTableProps {
   className?: string
   onRowClick?: (row: any) => void
 }
+
+// Notifications
+export type NotificationType = 'kyc_pending' | 'profile_change_pending' | 'new_vendor'
+
+export interface AdminNotification {
+  id: string
+  type: NotificationType
+  title: string
+  message: string
+  resourceId: string
+  href: string
+  createdAt: string
+}
+
+export interface NotificationsResponse {
+  notifications: AdminNotification[]
+  unreadCount: number
+}

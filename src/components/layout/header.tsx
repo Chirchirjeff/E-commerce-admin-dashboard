@@ -3,9 +3,10 @@
 import * as React from 'react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { Bell, Search, User, Menu, ChevronDown, Shield } from 'lucide-react';
+import { Search, User, Menu, ChevronDown, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { NotificationDropdown } from '@/components/notifications/NotificationDropdown';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -75,10 +76,7 @@ export function Header({ onMenuClick, className }: HeaderProps) {
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
+        <NotificationDropdown />
 
         {/* Theme toggle */}
         <ThemeToggle />
