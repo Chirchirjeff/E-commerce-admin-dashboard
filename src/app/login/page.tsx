@@ -105,7 +105,6 @@ export default function LoginPage() {
               <label className="text-sm font-medium">Email</label>
               <input
                 type="email"
-                placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className={cn(
@@ -125,7 +124,6 @@ export default function LoginPage() {
               <PasswordInput
                 id="password"
                 autoComplete="current-password"
-                placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className={cn(error && "border-red-500 focus-visible:ring-red-500")}

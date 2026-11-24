@@ -126,7 +126,6 @@ export function CreateProductForm() {
               value={formData.name}
               onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
               className="w-full px-3 py-2 border rounded-lg"
-              placeholder="Samsung Galaxy S25"
             />
           </div>
 
@@ -137,7 +136,6 @@ export function CreateProductForm() {
               onChange={e => setFormData(prev => ({ ...prev, description: e.target.value }))}
               className="w-full px-3 py-2 border rounded-lg"
               rows={3}
-              placeholder="Describe your product..."
             />
           </div>
 
@@ -151,7 +149,6 @@ export function CreateProductForm() {
                 value={formData.price}
                 onChange={e => setFormData(prev => ({ ...prev, price: e.target.value }))}
                 className="w-full px-3 py-2 border rounded-lg"
-                placeholder="999.99"
               />
             </div>
             <div>
@@ -161,7 +158,6 @@ export function CreateProductForm() {
                 value={formData.stockQuantity}
                 onChange={e => setFormData(prev => ({ ...prev, stockQuantity: e.target.value }))}
                 className="w-full px-3 py-2 border rounded-lg"
-                placeholder="50"
               />
             </div>
           </div>
@@ -173,7 +169,6 @@ export function CreateProductForm() {
               value={formData.thumbnailUrl}
               onChange={e => setFormData(prev => ({ ...prev, thumbnailUrl: e.target.value }))}
               className="w-full px-3 py-2 border rounded-lg"
-              placeholder="https://example.com/image.jpg"
             />
           </div>
         </CardContent>
@@ -219,7 +214,6 @@ export function CreateProductForm() {
                     value={formData.attributeValues[attr.attributeId] || ''}
                     onChange={e => handleAttributeChange(attr.attributeId, e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg"
-                    placeholder={`Enter ${attr.attribute.name}`}
                   />
                 )}
 
@@ -230,7 +224,6 @@ export function CreateProductForm() {
                     value={formData.attributeValues[attr.attributeId] || ''}
                     onChange={e => handleAttributeChange(attr.attributeId, e.target.value)}
                     className="w-full px-3 py-2 border rounded-lg"
-                    placeholder={`Enter ${attr.attribute.name}`}
                   />
                 )}
 
@@ -308,7 +301,7 @@ export function CreateProductForm() {
                 type="text"
                 value={searchTagQuery}
                 onChange={e => setSearchTagQuery(e.target.value)}
-                placeholder="Search tags..."
+                aria-label="Search tags"
                 className="w-full px-3 py-2 border rounded-lg"
               />
             </div>

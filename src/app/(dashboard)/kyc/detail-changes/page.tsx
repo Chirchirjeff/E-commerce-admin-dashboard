@@ -225,7 +225,7 @@ function DetailChangesContent() {
                       <textarea id={`note-${r.id}`} rows={2} maxLength={500} value={notes[r.id] ?? ''}
                         onChange={(e) => setNotes((n) => ({ ...n, [r.id]: e.target.value }))}
                         className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                        placeholder="e.g. Verified against the updated registration certificate" />
+                        />
                       <div className="flex flex-wrap justify-end gap-2">
                         <Button variant="outline" size="sm" disabled={busy} onClick={() => reject(r)}
                           className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:hover:bg-red-950">

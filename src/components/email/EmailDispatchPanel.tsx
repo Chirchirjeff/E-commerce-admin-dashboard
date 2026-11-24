@@ -40,7 +40,6 @@ interface TemplateField {
   key: string;
   label: string;
   type: 'text' | 'email' | 'number' | 'textarea' | 'select';
-  placeholder?: string;
   required?: boolean;
   options?: { value: string; label: string }[];
   defaultValue?: string;
@@ -63,10 +62,10 @@ const TEMPLATES: TemplateDef[] = [
     description: 'Security alert sent after a password change.',
     icon: KeyRound,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'Alice Mwangi' },
-      { key: 'changedAt', label: 'Changed at (ISO)', type: 'text', required: true, placeholder: new Date().toISOString(), defaultValue: new Date().toISOString() },
-      { key: 'ipAddress', label: 'IP address (optional)', type: 'text', placeholder: '41.90.64.1' },
-      { key: 'device', label: 'Device (optional)', type: 'text', placeholder: 'Chrome on macOS' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
+      { key: 'changedAt', label: 'Changed at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString() },
+      { key: 'ipAddress', label: 'IP address (optional)', type: 'text' },
+      { key: 'device', label: 'Device (optional)', type: 'text' },
     ],
     buildProps: (v) => ({
       recipientName: v.recipientName,
@@ -81,8 +80,8 @@ const TEMPLATES: TemplateDef[] = [
     description: 'Order status update with tracking details.',
     icon: Package,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'Brian Otieno' },
-      { key: 'orderId', label: 'Order ID', type: 'text', required: true, placeholder: 'QZ-20240801-0042' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
+      { key: 'orderId', label: 'Order ID', type: 'text', required: true },
       {
         key: 'orderStatus', label: 'Status', type: 'select', required: true,
         options: [
@@ -97,21 +96,20 @@ const TEMPLATES: TemplateDef[] = [
         ],
         defaultValue: 'shipped',
       },
-      { key: 'statusLabel', label: 'Status label', type: 'text', placeholder: 'Shipped' },
-      { key: 'trackingNumber', label: 'Tracking number', type: 'text', placeholder: 'KE123456789' },
-      { key: 'trackingUrl', label: 'Tracking URL', type: 'text', placeholder: 'https://track.example.com/...' },
-      { key: 'estimatedDelivery', label: 'Est. delivery', type: 'text', placeholder: 'Thursday, 25 Aug 2026' },
-      { key: 'vendorName', label: 'Vendor name', type: 'text', placeholder: 'TechHub Kenya' },
-      { key: 'totalAmount', label: 'Total (KES)', type: 'number', required: true, placeholder: '4500' },
+      { key: 'statusLabel', label: 'Status label', type: 'text' },
+      { key: 'trackingNumber', label: 'Tracking number', type: 'text' },
+      { key: 'trackingUrl', label: 'Tracking URL', type: 'text' },
+      { key: 'estimatedDelivery', label: 'Est. delivery', type: 'text' },
+      { key: 'vendorName', label: 'Vendor name', type: 'text' },
+      { key: 'totalAmount', label: 'Total (KES)', type: 'number', required: true },
       {
         key: 'itemsJson',
         label: 'Items JSON',
         type: 'textarea',
         required: true,
-        placeholder: '[{"name":"Product","quantity":1,"price":4500}]',
         defaultValue: '[{"name":"Sample Product","quantity":1,"price":4500}]',
       },
-      { key: 'updatedAt', label: 'Updated at (ISO)', type: 'text', required: true, placeholder: new Date().toISOString(), defaultValue: new Date().toISOString() },
+      { key: 'updatedAt', label: 'Updated at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString() },
     ],
     buildProps: (v) => {
       let items = [];
@@ -137,8 +135,8 @@ const TEMPLATES: TemplateDef[] = [
     description: 'Onboarding email for new customers, vendors, or admins.',
     icon: User,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'Grace Njoroge' },
-      { key: 'email', label: 'Account email', type: 'email', required: true, placeholder: 'grace@example.com' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
+      { key: 'email', label: 'Account email', type: 'email', required: true },
       {
         key: 'role', label: 'Role', type: 'select', required: true,
         options: [
@@ -148,8 +146,8 @@ const TEMPLATES: TemplateDef[] = [
         ],
         defaultValue: 'customer',
       },
-      { key: 'temporaryPassword', label: 'Temporary password (optional)', type: 'text', placeholder: 'Tmp@8324X' },
-      { key: 'ctaUrl', label: 'CTA URL (optional)', type: 'text', placeholder: 'https://quza.app/dashboard' },
+      { key: 'temporaryPassword', label: 'Temporary password (optional)', type: 'text' },
+      { key: 'ctaUrl', label: 'CTA URL (optional)', type: 'text' },
     ],
     buildProps: (v) => ({
       recipientName: v.recipientName,
@@ -165,7 +163,7 @@ const TEMPLATES: TemplateDef[] = [
     description: 'KYC verification outcome — approved, rejected, or pending.',
     icon: ShieldCheck,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'Samuel Kariuki' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
       {
         key: 'userType', label: 'User type', type: 'select', required: true,
         options: [
@@ -183,13 +181,12 @@ const TEMPLATES: TemplateDef[] = [
         ],
         defaultValue: 'approved',
       },
-      { key: 'reason', label: 'Reason / note (optional)', type: 'textarea', placeholder: 'Documents were blurry...' },
+      { key: 'reason', label: 'Reason / note (optional)', type: 'textarea' },
       {
         key: 'requiredDocumentsJson', label: 'Required documents JSON (optional)',
         type: 'textarea',
-        placeholder: '["National ID (front & back)", "Utility bill"]',
       },
-      { key: 'actionUrl', label: 'Action URL (optional)', type: 'text', placeholder: 'https://quza.app/kyc' },
+      { key: 'actionUrl', label: 'Action URL (optional)', type: 'text' },
     ],
     buildProps: (v) => {
       let docs: string[] = [];
@@ -210,9 +207,9 @@ const TEMPLATES: TemplateDef[] = [
     description: 'Vendor payout status update.',
     icon: DollarSign,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'Faith Kamau' },
-      { key: 'storeName', label: 'Store name', type: 'text', required: true, placeholder: 'FashionHub KE' },
-      { key: 'payoutId', label: 'Payout ID', type: 'text', required: true, placeholder: 'PY-20260825-007' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
+      { key: 'storeName', label: 'Store name', type: 'text', required: true },
+      { key: 'payoutId', label: 'Payout ID', type: 'text', required: true },
       {
         key: 'status', label: 'Status', type: 'select', required: true,
         options: [
@@ -223,13 +220,13 @@ const TEMPLATES: TemplateDef[] = [
         ],
         defaultValue: 'completed',
       },
-      { key: 'amount', label: 'Amount (KES)', type: 'number', required: true, placeholder: '47850' },
-      { key: 'destinationAccount', label: 'Destination account', type: 'text', required: true, placeholder: 'M-Pesa ****2234' },
-      { key: 'initiatedAt', label: 'Initiated at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString(), placeholder: new Date().toISOString() },
-      { key: 'settledAt', label: 'Settled at (ISO, optional)', type: 'text', placeholder: new Date().toISOString() },
-      { key: 'period', label: 'Period (optional)', type: 'text', placeholder: '18 Aug – 24 Aug 2026' },
-      { key: 'orderCount', label: 'Order count (optional)', type: 'number', placeholder: '12' },
-      { key: 'failureReason', label: 'Failure reason (optional)', type: 'textarea', placeholder: 'Insufficient M-Pesa float...' },
+      { key: 'amount', label: 'Amount (KES)', type: 'number', required: true },
+      { key: 'destinationAccount', label: 'Destination account', type: 'text', required: true },
+      { key: 'initiatedAt', label: 'Initiated at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString() },
+      { key: 'settledAt', label: 'Settled at (ISO, optional)', type: 'text' },
+      { key: 'period', label: 'Period (optional)', type: 'text' },
+      { key: 'orderCount', label: 'Order count (optional)', type: 'number' },
+      { key: 'failureReason', label: 'Failure reason (optional)', type: 'textarea' },
     ],
     buildProps: (v) => ({
       recipientName: v.recipientName,
@@ -251,8 +248,8 @@ const TEMPLATES: TemplateDef[] = [
     description: 'Vendor store approval, rejection, or suspension.',
     icon: Store,
     fields: [
-      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true, placeholder: 'James Mwangi' },
-      { key: 'storeName', label: 'Store name', type: 'text', required: true, placeholder: 'Organic Greens KE' },
+      { key: 'recipientName', label: 'Recipient name', type: 'text', required: true },
+      { key: 'storeName', label: 'Store name', type: 'text', required: true },
       {
         key: 'outcome', label: 'Outcome', type: 'select', required: true,
         options: [
@@ -262,13 +259,12 @@ const TEMPLATES: TemplateDef[] = [
         ],
         defaultValue: 'approved',
       },
-      { key: 'adminNote', label: 'Admin note (optional)', type: 'textarea', placeholder: 'All documents verified...' },
+      { key: 'adminNote', label: 'Admin note (optional)', type: 'textarea' },
       {
         key: 'nextStepsJson', label: 'Next steps JSON (optional)',
         type: 'textarea',
-        placeholder: '["Fix your ID document","Resubmit application"]',
       },
-      { key: 'reviewedAt', label: 'Reviewed at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString(), placeholder: new Date().toISOString() },
+      { key: 'reviewedAt', label: 'Reviewed at (ISO)', type: 'text', required: true, defaultValue: new Date().toISOString() },
     ],
     buildProps: (v) => {
       let steps: string[] = [];
@@ -320,7 +316,6 @@ function FieldInput({
       <Textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholder}
         className="min-h-[70px] font-mono text-xs"
       />
     );
@@ -331,7 +326,6 @@ function FieldInput({
       type={field.type === 'email' ? 'email' : field.type === 'number' ? 'number' : 'text'}
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={field.placeholder}
     />
   );
 }
@@ -464,7 +458,6 @@ export function EmailDispatchPanel() {
               <Input
                 id="recipient-email"
                 type="email"
-                placeholder="recipient@example.com"
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
               />
@@ -486,7 +479,6 @@ export function EmailDispatchPanel() {
                   <Label htmlFor="subject-override">Subject override (optional)</Label>
                   <Input
                     id="subject-override"
-                    placeholder="Leave blank to use the auto-generated subject"
                     value={subjectOverride}
                     onChange={(e) => setSubjectOverride(e.target.value)}
                   />

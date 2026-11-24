@@ -323,7 +323,6 @@ function DetailDrawer({ record, onClose, onApprove, onReject, isApproving, isRej
                 <label className="text-sm font-medium">Approval note <span className="text-muted-foreground font-normal">(optional)</span></label>
                 <textarea
                   className="w-full rounded-lg border bg-background px-3 py-2 text-sm min-h-[72px] focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                  placeholder="Add a note for the seller (optional)…"
                   value={comment}
                   onChange={e => setComment(e.target.value)}
                 />
@@ -335,7 +334,6 @@ function DetailDrawer({ record, onClose, onApprove, onReject, isApproving, isRej
                   <label className="text-sm font-semibold text-destructive">Rejection reason <span className="text-destructive">*</span></label>
                   <textarea
                     className="w-full rounded-lg border bg-background px-3 py-2 text-sm min-h-[80px] focus:outline-none focus:ring-2 focus:ring-ring resize-none"
-                    placeholder="Explain why this submission is being rejected so the seller can resubmit correctly…"
                     value={rejectReason}
                     onChange={e => setRejectReason(e.target.value)}
                     autoFocus

@@ -288,7 +288,6 @@ export default function SystemDocsPage() {
                     id="doc-title" required
                     value={uploadTitle}
                     onChange={(e) => setUploadTitle(e.target.value)}
-                    placeholder="e.g. GPC May 2026 Release Notes"
                   />
                 </div>
 
@@ -313,7 +312,6 @@ export default function SystemDocsPage() {
                   id="doc-desc" rows={2}
                   value={uploadDesc}
                   onChange={(e) => setUploadDesc(e.target.value)}
-                  placeholder="Brief note about this document…"
                 />
               </div>
 
@@ -359,7 +357,7 @@ export default function SystemDocsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-9"
-            placeholder="Search by title, filename or description…"
+            aria-label="Search documents by title, filename or description"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

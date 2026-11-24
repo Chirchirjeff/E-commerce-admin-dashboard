@@ -166,7 +166,6 @@ export function RoleDialog({
             <Label htmlFor="name">Role Name *</Label>
             <Input
               id="name"
-              placeholder="e.g., Content Manager"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -180,7 +179,6 @@ export function RoleDialog({
             <Label htmlFor="description">Description</Label>
             <Input
               id="description"
-              placeholder="Describe this role's purpose"
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })

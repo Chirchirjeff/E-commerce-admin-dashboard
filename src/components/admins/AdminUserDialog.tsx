@@ -143,7 +143,6 @@ export function AdminUserDialog({
             <Label htmlFor="name">Name *</Label>
             <Input
               id="name"
-              placeholder="Admin Name"
               value={formData.name}
               onChange={(e) => {
                 setFormData({ ...formData, name: e.target.value });
@@ -160,7 +159,6 @@ export function AdminUserDialog({
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
               value={formData.email}
               onChange={(e) => {
                 setFormData({ ...formData, email: e.target.value });
@@ -178,7 +176,6 @@ export function AdminUserDialog({
               <PasswordInput
                 id="password"
                 autoComplete="new-password"
-                placeholder={`At least ${PASSWORD_MIN_LENGTH} characters`}
                 value={formData.password || ''}
                 onChange={(e) => {
                   setFormData({ ...formData, password: e.target.value });
