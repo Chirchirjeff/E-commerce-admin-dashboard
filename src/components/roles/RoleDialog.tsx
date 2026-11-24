@@ -256,7 +256,7 @@ export function RoleDialog({
             </div>
 
             {formData.permissionIds.length > 0 && (
-              <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-900">
+              <div className="mt-3 p-2 bg-primary/5 border border-primary/20 rounded text-sm text-foreground">
                 <strong>Sidebar access:</strong> {Array.from(visibleSidebarItems).join(', ')}
               </div>
             )}

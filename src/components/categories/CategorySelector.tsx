@@ -89,7 +89,7 @@ export function CategorySelector({ value, onChange, onlyLeaf = true }: CategoryS
                 className={cn(
                   'w-full text-left px-3 py-2 rounded-md flex items-center gap-2 transition-colors',
                   'hover:bg-gray-100 dark:hover:bg-gray-800',
-                  isSelected && 'bg-blue-100 dark:bg-blue-900 font-semibold',
+                  isSelected && 'bg-primary/10 text-primary font-semibold',
                   !cat.isActive && 'opacity-50 line-through'
                 )}
                 style={{ marginLeft: `${depth * 16}px` }}
@@ -148,7 +148,7 @@ export function CategorySelector({ value, onChange, onlyLeaf = true }: CategoryS
     <div className="space-y-4">
       {/* Breadcrumb */}
       {selectedPath.length > 0 && (
-        <div className="flex items-center gap-2 text-sm bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+        <div className="flex items-center gap-2 text-sm bg-primary/5 p-3 rounded-md">
           <span className="font-medium">Selected Path:</span>
           <div className="flex items-center gap-1">
             {selectedPath.map((cat, i) => (
@@ -161,7 +161,7 @@ export function CategorySelector({ value, onChange, onlyLeaf = true }: CategoryS
                     onChange(lastCat.id, lastCat);
                     setSelectedPath(newPath);
                   }}
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   {cat.name}
                 </button>

@@ -6,12 +6,12 @@
 export const brand = {
   name: 'Quza',
   tagline: 'Your Marketplace, Simplified',
-  /** Primary brand colour (deep teal/green matching the admin UI) */
-  primary: '#0f766e',
+  /** Primary brand colour (Quza purple, matching the apps) */
+  primary: '#6535cc',
   /** Lighter variant for hover states, accents */
-  primaryLight: '#14b8a6',
+  primaryLight: '#ab8ffb',
   /** Dark background for the header band */
-  headerBg: '#0f172a',
+  headerBg: '#1a1033',
   /** Foreground text on dark header */
   headerFg: '#f8fafc',
   /** Body background */

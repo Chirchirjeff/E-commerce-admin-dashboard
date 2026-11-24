@@ -97,8 +97,8 @@ export default function ProductsPage() {
               onClick={() => setViewMode('categories')}
               className={`px-3 py-2 rounded transition-colors ${
                 viewMode === 'categories'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'hover:bg-muted'
               }`}
               title="View by Categories"
             >
@@ -108,8 +108,8 @@ export default function ProductsPage() {
               onClick={() => setViewMode('table')}
               className={`px-3 py-2 rounded transition-colors ${
                 viewMode === 'table'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'hover:bg-gray-100'
+                  ? 'bg-primary/10 text-primary'
+                  : 'hover:bg-muted'
               }`}
               title="View as Table"
             >
@@ -267,7 +267,7 @@ export default function ProductsPage() {
                               {product.tags && product.tags.length > 0 ? (
                                 <div className="flex flex-wrap gap-1">
                                   {product.tags.slice(0, 2).map((tag, idx) => (
-                                    <span key={idx} className="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                                    <span key={idx} className="inline-block px-2 py-1 bg-primary/10 text-primary text-xs rounded">
                                       {tag}
                                     </span>
                                   ))}

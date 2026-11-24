@@ -315,8 +315,8 @@ export function CreateProductForm() {
                   className={cn(
                     'flex items-center gap-2 px-3 py-1 rounded-full border transition-colors',
                     formData.selectedTags.includes(tag.id)
-                      ? 'bg-blue-100 border-blue-300'
-                      : 'hover:bg-gray-100'
+                      ? 'bg-primary/10 border-primary/40 text-primary'
+                      : 'hover:bg-muted'
                   )}
                   style={{
                     backgroundColor: tag.color && formData.selectedTags.includes(tag.id)
@@ -335,7 +335,7 @@ export function CreateProductForm() {
 
       {/* Selected Tags Display */}
       {formData.selectedTags.length > 0 && (
-        <Card className="bg-blue-50">
+        <Card className="bg-primary/5">
           <CardContent className="p-4">
             <p className="text-sm font-medium mb-2">Selected Tags:</p>
             <div className="flex flex-wrap gap-2">
