@@ -34,6 +34,8 @@ export interface VendorData {
 export interface RecentOrder {
   id: string;
   customer: string;
+  customerUsername?: string | null;
+  customerAvatarUrl?: string | null;
   vendor: string;
   amount: number;
   status: string;
@@ -99,6 +101,8 @@ export function useRecentOrders(limit: number = 5) {
       return data.map((order: any) => ({
         id: order.id,
         customer: order.deliveryName || order.buyer?.name || 'Unknown',
+        customerUsername: order.buyer?.username ?? null,
+        customerAvatarUrl: order.buyer?.avatarUrl ?? null,
         vendor: order.shop?.name || 'Unknown',
         amount: order.total,
         status: order.status,

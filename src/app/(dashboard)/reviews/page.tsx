@@ -11,12 +11,15 @@ import { LoadingStatus, StatCardsSkeleton, TableCardSkeleton } from '@/component
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { UserIdentity } from '@/components/shared/user-identity'
 import { Star, Filter, Download, CheckCircle, XCircle, AlertCircle } from 'lucide-react'
 
 interface Review {
   id: string | number
   product: string
   customer: string
+  customerUsername?: string | null
+  customerAvatarUrl?: string | null
   vendor: string
   rating: number
   comment: string
@@ -241,7 +244,9 @@ export default function ReviewsPage() {
                       <tr key={review.id} className="hover:bg-muted/50">
                         <td className="px-4 py-3 text-sm">{review.id}</td>
                         <td className="px-4 py-3">{review.product}</td>
-                        <td className="px-4 py-3">{review.customer}</td>
+                        <td className="px-4 py-3">
+                          <UserIdentity name={review.customer} username={review.customerUsername} avatarUrl={review.customerAvatarUrl} />
+                        </td>
                         <td className="px-4 py-3">{review.vendor}</td>
                         <td className="px-4 py-3">{review.rating} ★</td>
                         <td className="px-4 py-3 max-w-xs truncate">{review.comment}</td>

@@ -15,6 +15,8 @@ import {
   LoadingStatus,
 } from '@/components/shared/skeletons';
 import { DataTable } from '@/components/shared/data-table';
+import { UserIdentity } from '@/components/shared/user-identity';
+import type { RecentOrder } from '@/hooks/use-dashboard';
 import {
   useDashboardStats,
   useRevenueData,
@@ -238,7 +240,13 @@ export default function DashboardPage() {
           isLoading={ordersLoading}
           columns={[
             { key: 'id', label: 'Order ID', className: 'font-mono text-sm' },
-            { key: 'customer', label: 'Customer' },
+            {
+              key: 'customer',
+              label: 'Customer',
+              render: (value: string, row: RecentOrder) => (
+                <UserIdentity name={value} username={row.customerUsername} avatarUrl={row.customerAvatarUrl} />
+              ),
+            },
             { key: 'vendor', label: 'Vendor' },
             { key: 'amount', label: 'Amount', render: (value) => `Ksh ${value?.toFixed(2)}` },
             {

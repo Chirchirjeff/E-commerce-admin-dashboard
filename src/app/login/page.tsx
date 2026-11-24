@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Store, Loader2 } from 'lucide-react';
+import { Store, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth, getDefaultRoute } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,6 @@ export default function LoginPage() {
   const router = useRouter();
   const { login, loading: authLoading, admin, permissions } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState('');
   const [formData, setFormData] = React.useState({
     email: '',
@@ -120,30 +120,21 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium">Password</label>
+                <label htmlFor="password" className="text-sm font-medium">Password</label>
               </div>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={cn(
-                    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-                    error && "border-red-500 focus-visible:ring-red-500"
-                  )}
-                  required
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <PasswordInput
+                id="password"
+                autoComplete="current-password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className={cn(error && "border-red-500 focus-visible:ring-red-500")}
+                required
+                disabled={isLoading}
+              />
+              <p className="text-xs text-muted-foreground">
+                Forgot your password? Ask a super admin to reset it.
+              </p>
             </div>
 
             {error && (

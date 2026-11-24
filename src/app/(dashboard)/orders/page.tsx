@@ -11,11 +11,14 @@ import { LoadingStatus, StatCardsSkeleton, TableCardSkeleton } from '@/component
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { UserIdentity } from '@/components/shared/user-identity'
 import { ShoppingCart, Filter, Download, Clock, Truck, CheckCircle, XCircle } from 'lucide-react'
 
 interface Order {
   id: string
   customer: string
+  customerUsername?: string | null
+  customerAvatarUrl?: string | null
   vendor: string
   amount: number
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'returned' | 'cancelled'
@@ -196,7 +199,9 @@ export default function OrdersPage() {
                     {orders.map((order) => (
                       <tr key={order.id} className="hover:bg-muted/50">
                         <td className="px-4 py-3 font-mono text-sm">{order.id}</td>
-                        <td className="px-4 py-3">{order.customer}</td>
+                        <td className="px-4 py-3">
+                          <UserIdentity name={order.customer} username={order.customerUsername} avatarUrl={order.customerAvatarUrl} />
+                        </td>
                         <td className="px-4 py-3">{order.vendor}</td>
                         <td className="px-4 py-3">{order.items}</td>
                         <td className="px-4 py-3">${order.amount.toFixed(2)}</td>
