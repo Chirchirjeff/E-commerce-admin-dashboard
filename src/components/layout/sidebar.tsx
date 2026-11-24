@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/hooks/useNotifications';
 import {
   LayoutDashboard,
   Users,
@@ -80,11 +81,15 @@ interface NavLinkProps {
   label: string;
   isActive: boolean;
   collapsed: boolean;
+  /** Items in this section waiting for an admin to act on (0 = no badge) */
+  pending: number;
   /** Only passed for mobile links so clicking closes the panel */
   onMobileClose: () => void;
 }
 
-function NavLink({ href, icon: Icon, label, isActive, collapsed, onMobileClose }: NavLinkProps) {
+function NavLink({ href, icon: Icon, label, isActive, collapsed, pending, onMobileClose }: NavLinkProps) {
+  const hasPending = pending > 0;
+  const pendingLabel = `${pending} need${pending === 1 ? 's' : ''} action`;
   return (
     <Link
       href={href}
@@ -95,15 +100,34 @@ function NavLink({ href, icon: Icon, label, isActive, collapsed, onMobileClose }
           onMobileClose()
         }
       }}
-      title={collapsed ? label : undefined}
+      title={collapsed ? (hasPending ? `${label} — ${pendingLabel}` : label) : undefined}
       className={cn(
         'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all hover:bg-accent hover:text-accent-foreground',
         isActive && 'bg-accent text-accent-foreground font-medium',
         collapsed && 'justify-center px-2'
       )}
     >
-      <Icon className="h-4 w-4 flex-shrink-0" />
+      <span className="relative flex-shrink-0">
+        <Icon className="h-4 w-4" />
+        {/* Collapsed sidebar has no room for a number — show a dot on the icon */}
+        {hasPending && collapsed && (
+          <span
+            className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-card"
+            aria-hidden="true"
+          />
+        )}
+      </span>
       {!collapsed && <span className="truncate">{label}</span>}
+      {hasPending && !collapsed && (
+        <span
+          className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold leading-none text-white"
+          aria-label={pendingLabel}
+          title={pendingLabel}
+        >
+          {pending > 99 ? '99+' : pending}
+        </span>
+      )}
+      {hasPending && collapsed && <span className="sr-only">{pendingLabel}</span>}
     </Link>
   );
 }
@@ -117,12 +141,15 @@ function NavSection({
   items,
   pathname,
   collapsed,
+  counts,
   onMobileClose,
 }: {
   title: string;
   items: typeof ALL_MENU_ITEMS;
   pathname: string;
   collapsed: boolean;
+  /** Pending-action totals keyed by route */
+  counts: Record<string, number>;
   onMobileClose: () => void;
 }) {
   if (items.length === 0) return null;
@@ -143,6 +170,7 @@ function NavSection({
               label={item.label}
               isActive={pathname === item.href || pathname?.startsWith(item.href + '/')}
               collapsed={collapsed}
+              pending={counts[item.href] ?? 0}
               onMobileClose={onMobileClose}
             />
           </li>
@@ -159,6 +187,7 @@ function NavSection({
 export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseToggle }: SidebarProps) {
   const pathname = usePathname();
   const { admin, permissions, logout } = useAuth();
+  const { counts } = useNotifications();
 
   const visible = ALL_MENU_ITEMS.filter(item =>
     !item.permission || permissions.includes(item.permission)
@@ -237,6 +266,7 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
           items={mainItems}
           pathname={pathname}
           collapsed={desktopCollapsed}
+          counts={counts}
           onMobileClose={onMobileClose}
         />
         <NavSection
@@ -244,6 +274,7 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
           items={kycItems}
           pathname={pathname}
           collapsed={desktopCollapsed}
+          counts={counts}
           onMobileClose={onMobileClose}
         />
         <NavSection
@@ -251,6 +282,7 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
           items={adminItems}
           pathname={pathname}
           collapsed={desktopCollapsed}
+          counts={counts}
           onMobileClose={onMobileClose}
         />
         <NavSection
@@ -258,6 +290,7 @@ export function Sidebar({ onMobileClose, desktopCollapsed, onDesktopCollapseTogg
           items={platformItems}
           pathname={pathname}
           collapsed={desktopCollapsed}
+          counts={counts}
           onMobileClose={onMobileClose}
         />
       </nav>

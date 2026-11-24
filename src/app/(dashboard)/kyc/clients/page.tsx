@@ -446,8 +446,13 @@ function KYCClientsContent() {
   const approveMutation = useMutation({
     mutationFn: ({ id, comment }: { id: string; comment: string }) =>
       apiClient.post(`/kyc/${id}/approve`, { comment }),
-    onSuccess: () => {
-      toast.success('Client verified', 'The client has been verified and now has full platform access.');
+    onSuccess: (res) => {
+      if (res.data?.emailSent === false) {
+        toast.error('Client verified — email not sent', 'The decision was saved, but the client could not be emailed. Open the notification bell to resend it.');
+      } else {
+        toast.success('Client verified', 'The client has been verified and emailed.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['kyc', 'clients'] });
       setSelectedId(null);
     },
@@ -458,8 +463,13 @@ function KYCClientsContent() {
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       apiClient.post(`/kyc/${id}/reject`, { reason }),
-    onSuccess: () => {
-      toast.success('Client rejected', 'The client has been notified and can resubmit.');
+    onSuccess: (res) => {
+      if (res.data?.emailSent === false) {
+        toast.error('Client rejected — email not sent', 'The decision was saved, but the client could not be emailed. Open the notification bell to resend it.');
+      } else {
+        toast.success('Client rejected', 'The client has been notified and can resubmit.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['kyc', 'clients'] });
       setSelectedId(null);
     },

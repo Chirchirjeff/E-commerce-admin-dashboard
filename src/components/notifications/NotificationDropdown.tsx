@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Bell, FileCheck, UserPlus, FileEdit, RefreshCw, AlertCircle, CheckCheck } from 'lucide-react';
+import { Bell, FileCheck, UserPlus, FileEdit, RefreshCw, AlertCircle, CheckCheck, MailWarning } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -18,6 +18,8 @@ function typeIcon(type: NotificationType) {
       return <FileEdit className="h-4 w-4 text-orange-500" />;
     case 'new_vendor':
       return <UserPlus className="h-4 w-4 text-green-500" />;
+    case 'email_failed':
+      return <MailWarning className="h-4 w-4 text-red-500" />;
   }
 }
 
@@ -29,6 +31,8 @@ function typeBadgeClass(type: NotificationType) {
       return 'bg-orange-500/10 text-orange-600 dark:text-orange-400';
     case 'new_vendor':
       return 'bg-green-500/10 text-green-600 dark:text-green-400';
+    case 'email_failed':
+      return 'bg-red-500/10 text-red-600 dark:text-red-400';
   }
 }
 
@@ -79,6 +83,61 @@ function NotificationItem({
         </p>
       </div>
     </Link>
+  );
+}
+
+// ── Failed seller email: needs Retry / Dismiss, so it is not a plain link ────
+
+function EmailFailureItem({ notification }: { notification: AdminNotification }) {
+  const { retryEmail, dismissEmail } = useNotifications();
+  const [retryError, setRetryError] = React.useState<string | null>(null);
+  const busy = retryEmail.isPending || dismissEmail.isPending;
+
+  async function retry() {
+    setRetryError(null);
+    try {
+      const result = await retryEmail.mutateAsync(notification.resourceId);
+      if (!result.sent) setRetryError(result.error ?? 'The email failed again.');
+    } catch {
+      setRetryError('Could not retry right now. Please try again.');
+    }
+  }
+
+  return (
+    <div className="flex items-start gap-3 rounded-md bg-red-500/5 px-3 py-2.5">
+      <span
+        className={cn(
+          'mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full',
+          typeBadgeClass(notification.type),
+        )}
+      >
+        {typeIcon(notification.type)}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium leading-snug">{notification.title}</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">{notification.message}</p>
+        {retryError && (
+          <p className="mt-1 text-xs text-destructive">Still failing: {retryError}</p>
+        )}
+        <div className="mt-2 flex items-center gap-2">
+          <Button size="sm" className="h-7 px-2.5 text-xs" disabled={busy} onClick={retry}>
+            {retryEmail.isPending ? 'Sending…' : 'Resend email'}
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2.5 text-xs"
+            disabled={busy}
+            onClick={() => dismissEmail.mutate(notification.resourceId)}
+          >
+            Dismiss
+          </Button>
+          <span className="ml-auto text-xs text-muted-foreground/70">
+            {relativeTime(notification.createdAt)}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -202,10 +261,14 @@ export function NotificationDropdown() {
               <ul className="space-y-0.5">
                 {notifications.map((n) => (
                   <li key={n.id}>
-                    <NotificationItem
-                      notification={n}
-                      onNavigate={() => setOpen(false)}
-                    />
+                    {n.type === 'email_failed' ? (
+                      <EmailFailureItem notification={n} />
+                    ) : (
+                      <NotificationItem
+                        notification={n}
+                        onNavigate={() => setOpen(false)}
+                      />
+                    )}
                   </li>
                 ))}
               </ul>

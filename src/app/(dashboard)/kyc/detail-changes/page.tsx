@@ -97,6 +97,7 @@ function DetailChangesContent() {
       setFeedback({ type: 'success', text: vars.action === 'approve' ? 'Change approved and applied. The seller has been emailed.' : 'Request rejected. The seller has been emailed the reason.' });
       setNotes((n) => ({ ...n, [vars.id]: '' }));
       queryClient.invalidateQueries({ queryKey: ['profile-change-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
     },
     onError: (err) => setFeedback({ type: 'error', text: errorMessage(err, 'Could not save this decision.') }),
   });

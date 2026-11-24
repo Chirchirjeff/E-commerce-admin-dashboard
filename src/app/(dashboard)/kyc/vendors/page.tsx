@@ -455,8 +455,13 @@ function KYCVendorsContent() {
   const approveMutation = useMutation({
     mutationFn: ({ id, comment }: { id: string; comment: string }) =>
       apiClient.post(`/kyc/${id}/approve`, { comment }),
-    onSuccess: () => {
-      toast.success('Vendor approved', 'The seller has been verified and their shop is now active.');
+    onSuccess: (res) => {
+      if (res.data?.emailSent === false) {
+        toast.error('Vendor approved — email not sent', 'The decision was saved, but the seller could not be emailed. Open the notification bell to resend it.');
+      } else {
+        toast.success('Vendor approved', 'The seller has been verified, their shop is now active and they have been emailed.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['kyc'] });
       setSelectedId(null);
     },
@@ -467,8 +472,13 @@ function KYCVendorsContent() {
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       apiClient.post(`/kyc/${id}/reject`, { reason }),
-    onSuccess: () => {
-      toast.success('Vendor rejected', 'The seller has been notified and can resubmit.');
+    onSuccess: (res) => {
+      if (res.data?.emailSent === false) {
+        toast.error('Vendor rejected — email not sent', 'The decision was saved, but the seller could not be emailed. Open the notification bell to resend it.');
+      } else {
+        toast.success('Vendor rejected', 'The seller has been notified and can resubmit.');
+      }
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notifications'] });
       queryClient.invalidateQueries({ queryKey: ['kyc'] });
       setSelectedId(null);
     },

@@ -74,7 +74,7 @@ export interface DataTableProps {
 }
 
 // Notifications
-export type NotificationType = 'kyc_pending' | 'profile_change_pending' | 'new_vendor'
+export type NotificationType = 'kyc_pending' | 'profile_change_pending' | 'new_vendor' | 'email_failed'
 
 export interface AdminNotification {
   id: string
@@ -89,4 +89,6 @@ export interface AdminNotification {
 export interface NotificationsResponse {
   notifications: AdminNotification[]
   unreadCount: number
+  /** Items awaiting action per sidebar route, e.g. { '/kyc/vendors': 3 } */
+  counts?: Record<string, number>
 }
